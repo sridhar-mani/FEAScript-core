@@ -23,5 +23,4 @@ Thank you for your interest in contributing! FEAScript is in early development, 
       ```bash
       python -m http.server
       ```
-   where the server will be available at `http://127.0.0.1:8000/`
-   Static file server npm packages like [serve](https://github.com/vercel/serve#readme) and [Vite](https://vite.dev/) can also be used.
+   where the server will be available at `http://127.0.0.1:8000/`. Static file server npm packages like [serve](https://github.com/vercel/serve#readme) and [Vite](https://vite.dev/) can also be used.
