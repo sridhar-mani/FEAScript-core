@@ -19,11 +19,9 @@ Thank you for your interest in contributing! FEAScript is in early development, 
    import { FEAScriptModel, plotSolution, printVersion } from "[USER_DIRECTORY]/FEAScript-core/src/index.js";
    ```
 
-   For security reasons, it is still recommended to use a local server to handle CORS policies correctly. You can use a <a href="https://docs.python.org/3/library/http.server.html" target="_blank">Python HTTP Server</a> by executing the following <a href="https://github.com/FEAScript/FEAScript-website/blob/main/corsHttpServer.py" target="_blank">script</a> to start a local server:
-
-   ```bash
-   python3 corsHttpServer.py
-   ```
-
-   The server will be available at:  
-   `http://127.0.0.1:8000/`
+   FEAScript can be run on a local server. To start a local server, you can use [Python HTTP Server](https://docs.python.org/3/library/http.server.html):
+      ```bash
+      python -m http.server
+      ```
+   where the server will be available at `http://127.0.0.1:8000/`
+   Static file server npm packages like [serve](https://github.com/vercel/serve#readme) and [Vite](https://vite.dev/) can also be used.
