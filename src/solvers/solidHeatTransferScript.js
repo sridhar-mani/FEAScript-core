@@ -27,9 +27,9 @@ export function assembleSolidHeatTransferMat(meshConfig, boundaryConditions) {
   const {
     meshDimension, // The dimension of the mesh
     numElementsX, // Number of elements in x-direction
-    numElementsY, // Number of elements in y-direction
+    numElementsY, // Number of elements in y-direction (only for 2D)
     maxX, // Max x-coordinate (m) of the domain
-    maxY, // Max y-coordinate (m) of the domain
+    maxY, // Max y-coordinate (m) of the domain (only for 2D)
     elementOrder, // The order of elements
   } = meshConfig;
 
@@ -66,24 +66,24 @@ export function assembleSolidHeatTransferMat(meshConfig, boundaryConditions) {
   let boundaryElements = nodesCoordinatesAndNumbering.boundaryElements;
 
   // Initialize variables for matrix assembly
-  const totalElements = numElementsX * numElementsY; // Total number of elements
-  const totalNodes = totalNodesX * totalNodesY; // Total number of nodes
+  const totalElements = numElementsX * (meshDimension === '2D' ? numElementsY : 1); // Total number of elements
+  const totalNodes = totalNodesX * (meshDimension === '2D' ? totalNodesY : 1); // Total number of nodes
   let localNodalNumbers = []; // Local nodal numbering
   let gaussPoints = []; // Gauss points
   let gaussWeights = []; // Gauss weights
   let basisFunction = []; // Basis functions
   let basisFunctionDerivKsi = []; // Derivatives of basis functions with respect to ksi
-  let basisFunctionDerivEta = []; // Derivatives of basis functions with respect to eta
+  let basisFunctionDerivEta = []; // Derivatives of basis functions with respect to eta (only for 2D)
   let basisFunctionDerivX = []; // The x-derivative of the basis function
-  let basisFunctionDerivY = []; // The y-derivative of the basis function
+  let basisFunctionDerivY = []; // The y-derivative of the basis function (only for 2D)
   let residualVector = []; // Galerkin residuals
   let jacobianMatrix = []; // Jacobian matrix
   let xCoordinates; // x-coordinate (physical coordinates)
-  let yCoordinates; // y-coordinate (physical coordinates)
+  let yCoordinates; // y-coordinate (physical coordinates) (only for 2D)
   let ksiDerivX; // ksi-derivative of xCoordinates
-  let etaDerivX; // eta-derivative of xCoordinates (ksi and eta are natural coordinates that vary within a reference element)
-  let ksiDerivY; // ksi-derivative of yCoordinates
-  let etaDerivY; // eta-derivative of yCoordinates
+  let etaDerivX; // eta-derivative of xCoordinates (ksi and eta are natural coordinates that vary within a reference element) (only for 2D)
+  let ksiDerivY; // ksi-derivative of yCoordinates (only for 2D)
+  let etaDerivY; // eta-derivative of yCoordinates (only for 2D)
   let detJacobian; // The jacobian of the isoparametric mapping
 
   // Initialize jacobianMatrix and residualVector arrays
@@ -155,7 +155,7 @@ export function assembleSolidHeatTransferMat(meshConfig, boundaryConditions) {
             nodesYCoordinates[localNodalNumbers[localNodeIndex]] * basisFunctionDerivKsi[localNodeIndex];
           etaDerivY +=
             nodesYCoordinates[localNodalNumbers[localNodeIndex]] * basisFunctionDerivEta[localNodeIndex];
-          detJacobian = ksiDerivX * etaDerivY - etaDerivX * ksiDerivY;
+            detJacobian = meshDimension === '2D' ? ksiDerivX * etaDerivY - etaDerivX * ksiDerivY : ksiDerivX;
         }
 
         // Compute x-derivative and y-derivative of basis functions
