@@ -124,50 +124,30 @@ export function assembleSolidHeatTransferMat(meshConfig, boundaryConditions) {
 
     // Loop over Gauss points
     for (let gaussPointIndex1 = 0; gaussPointIndex1 < gaussPoints.length; gaussPointIndex1++) {
-      for (let gaussPointIndex2 = 0; gaussPointIndex2 < gaussPoints.length; gaussPointIndex2++) {
-        // Initialise variables for isoparametric mapping
+      // 1D solid heat transfer
+      if (meshDimension === '1D') {
         let basisFunctionsAndDerivatives = basisFunctionsData.getBasisFunctions(
-          gaussPoints[gaussPointIndex1],
-          gaussPoints[gaussPointIndex2]
+          gaussPoints[gaussPointIndex1]
         );
         basisFunction = basisFunctionsAndDerivatives.basisFunction;
         basisFunctionDerivKsi = basisFunctionsAndDerivatives.basisFunctionDerivKsi;
-        basisFunctionDerivEta = basisFunctionsAndDerivatives.basisFunctionDerivEta;
         xCoordinates = 0;
-        yCoordinates = 0;
         ksiDerivX = 0;
-        etaDerivX = 0;
-        ksiDerivY = 0;
-        etaDerivY = 0;
         detJacobian = 0;
 
         // Isoparametric mapping
         for (let localNodeIndex = 0; localNodeIndex < numNodes; localNodeIndex++) {
           xCoordinates +=
             nodesXCoordinates[localNodalNumbers[localNodeIndex]] * basisFunction[localNodeIndex];
-          yCoordinates +=
-            nodesYCoordinates[localNodalNumbers[localNodeIndex]] * basisFunction[localNodeIndex];
           ksiDerivX +=
             nodesXCoordinates[localNodalNumbers[localNodeIndex]] * basisFunctionDerivKsi[localNodeIndex];
-          etaDerivX +=
-            nodesXCoordinates[localNodalNumbers[localNodeIndex]] * basisFunctionDerivEta[localNodeIndex];
-          ksiDerivY +=
-            nodesYCoordinates[localNodalNumbers[localNodeIndex]] * basisFunctionDerivKsi[localNodeIndex];
-          etaDerivY +=
-            nodesYCoordinates[localNodalNumbers[localNodeIndex]] * basisFunctionDerivEta[localNodeIndex];
-            detJacobian = meshDimension === '2D' ? ksiDerivX * etaDerivY - etaDerivX * ksiDerivY : ksiDerivX;
+          detJacobian = ksiDerivX;
         }
 
-        // Compute x-derivative and y-derivative of basis functions
+        // Compute x-derivative of basis functions
         for (let localNodeIndex = 0; localNodeIndex < numNodes; localNodeIndex++) {
           basisFunctionDerivX[localNodeIndex] =
-            (etaDerivY * basisFunctionDerivKsi[localNodeIndex] -
-              ksiDerivY * basisFunctionDerivEta[localNodeIndex]) /
-            detJacobian; // The x-derivative of the n basis function
-          basisFunctionDerivY[localNodeIndex] =
-            (ksiDerivX * basisFunctionDerivEta[localNodeIndex] -
-              etaDerivX * basisFunctionDerivKsi[localNodeIndex]) /
-            detJacobian; // The y-derivative of the n basis function
+            basisFunctionDerivKsi[localNodeIndex] / detJacobian; // The x-derivative of the n basis function
         }
 
         // Computation of Galerkin's residuals and Jacobian matrix
@@ -175,7 +155,6 @@ export function assembleSolidHeatTransferMat(meshConfig, boundaryConditions) {
           let globalNodeIndex1 = localNodalNumbers[localNodeIndex1];
           residualVector[globalNodeIndex1] +=
             gaussWeights[gaussPointIndex1] *
-            gaussWeights[gaussPointIndex2] *
             detJacobian *
             basisFunction[localNodeIndex1];
 
@@ -183,10 +162,76 @@ export function assembleSolidHeatTransferMat(meshConfig, boundaryConditions) {
             let globalNodeIndex2 = localNodalNumbers[localNodeIndex2];
             jacobianMatrix[globalNodeIndex1][globalNodeIndex2] +=
               -gaussWeights[gaussPointIndex1] *
+              detJacobian *
+              (basisFunctionDerivX[localNodeIndex1] * basisFunctionDerivX[localNodeIndex2]);
+          }
+        }
+      // 2D solid heat transfer
+      } else if (meshDimension === '2D') {
+        for (let gaussPointIndex2 = 0; gaussPointIndex2 < gaussPoints.length; gaussPointIndex2++) {
+          // Initialise variables for isoparametric mapping
+          let basisFunctionsAndDerivatives = basisFunctionsData.getBasisFunctions(
+            gaussPoints[gaussPointIndex1],
+            gaussPoints[gaussPointIndex2]
+          );
+          basisFunction = basisFunctionsAndDerivatives.basisFunction;
+          basisFunctionDerivKsi = basisFunctionsAndDerivatives.basisFunctionDerivKsi;
+          basisFunctionDerivEta = basisFunctionsAndDerivatives.basisFunctionDerivEta;
+          xCoordinates = 0;
+          yCoordinates = 0;
+          ksiDerivX = 0;
+          etaDerivX = 0;
+          ksiDerivY = 0;
+          etaDerivY = 0;
+          detJacobian = 0;
+
+          // Isoparametric mapping
+          for (let localNodeIndex = 0; localNodeIndex < numNodes; localNodeIndex++) {
+            xCoordinates +=
+              nodesXCoordinates[localNodalNumbers[localNodeIndex]] * basisFunction[localNodeIndex];
+            yCoordinates +=
+              nodesYCoordinates[localNodalNumbers[localNodeIndex]] * basisFunction[localNodeIndex];
+            ksiDerivX +=
+              nodesXCoordinates[localNodalNumbers[localNodeIndex]] * basisFunctionDerivKsi[localNodeIndex];
+            etaDerivX +=
+              nodesXCoordinates[localNodalNumbers[localNodeIndex]] * basisFunctionDerivEta[localNodeIndex];
+            ksiDerivY +=
+              nodesYCoordinates[localNodalNumbers[localNodeIndex]] * basisFunctionDerivKsi[localNodeIndex];
+            etaDerivY +=
+              nodesYCoordinates[localNodalNumbers[localNodeIndex]] * basisFunctionDerivEta[localNodeIndex];
+              detJacobian = meshDimension === '2D' ? ksiDerivX * etaDerivY - etaDerivX * ksiDerivY : ksiDerivX;
+          }
+
+          // Compute x-derivative and y-derivative of basis functions
+          for (let localNodeIndex = 0; localNodeIndex < numNodes; localNodeIndex++) {
+            basisFunctionDerivX[localNodeIndex] =
+              (etaDerivY * basisFunctionDerivKsi[localNodeIndex] -
+                ksiDerivY * basisFunctionDerivEta[localNodeIndex]) /
+              detJacobian; // The x-derivative of the n basis function
+            basisFunctionDerivY[localNodeIndex] =
+              (ksiDerivX * basisFunctionDerivEta[localNodeIndex] -
+                etaDerivX * basisFunctionDerivKsi[localNodeIndex]) /
+              detJacobian; // The y-derivative of the n basis function
+          }
+
+          // Computation of Galerkin's residuals and Jacobian matrix
+          for (let localNodeIndex1 = 0; localNodeIndex1 < numNodes; localNodeIndex1++) {
+            let globalNodeIndex1 = localNodalNumbers[localNodeIndex1];
+            residualVector[globalNodeIndex1] +=
+              gaussWeights[gaussPointIndex1] *
               gaussWeights[gaussPointIndex2] *
               detJacobian *
-              (basisFunctionDerivX[localNodeIndex1] * basisFunctionDerivX[localNodeIndex2] +
-                basisFunctionDerivY[localNodeIndex1] * basisFunctionDerivY[localNodeIndex2]);
+              basisFunction[localNodeIndex1];
+
+            for (let localNodeIndex2 = 0; localNodeIndex2 < numNodes; localNodeIndex2++) {
+              let globalNodeIndex2 = localNodalNumbers[localNodeIndex2];
+              jacobianMatrix[globalNodeIndex1][globalNodeIndex2] +=
+                -gaussWeights[gaussPointIndex1] *
+                gaussWeights[gaussPointIndex2] *
+                detJacobian *
+                (basisFunctionDerivX[localNodeIndex1] * basisFunctionDerivX[localNodeIndex2] +
+                  basisFunctionDerivY[localNodeIndex1] * basisFunctionDerivY[localNodeIndex2]);
+            }
           }
         }
       }
