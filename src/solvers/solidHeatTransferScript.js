@@ -66,8 +66,8 @@ export function assembleSolidHeatTransferMat(meshConfig, boundaryConditions) {
   let boundaryElements = nodesCoordinatesAndNumbering.boundaryElements;
 
   // Initialize variables for matrix assembly
-  const totalElements = numElementsX * (meshDimension === '2D' ? numElementsY : 1); // Total number of elements
-  const totalNodes = totalNodesX * (meshDimension === '2D' ? totalNodesY : 1); // Total number of nodes
+  const totalElements = numElementsX * (meshDimension === "2D" ? numElementsY : 1); // Total number of elements
+  const totalNodes = totalNodesX * (meshDimension === "2D" ? totalNodesY : 1); // Total number of nodes
   let localNodalNumbers = []; // Local nodal numbering
   let gaussPoints = []; // Gauss points
   let gaussWeights = []; // Gauss weights
@@ -125,7 +125,7 @@ export function assembleSolidHeatTransferMat(meshConfig, boundaryConditions) {
     // Loop over Gauss points
     for (let gaussPointIndex1 = 0; gaussPointIndex1 < gaussPoints.length; gaussPointIndex1++) {
       // 1D solid heat transfer
-      if (meshDimension === '1D') {
+      if (meshDimension === "1D") {
         let basisFunctionsAndDerivatives = basisFunctionsData.getBasisFunctions(
           gaussPoints[gaussPointIndex1]
         );
@@ -146,17 +146,14 @@ export function assembleSolidHeatTransferMat(meshConfig, boundaryConditions) {
 
         // Compute x-derivative of basis functions
         for (let localNodeIndex = 0; localNodeIndex < numNodes; localNodeIndex++) {
-          basisFunctionDerivX[localNodeIndex] =
-            basisFunctionDerivKsi[localNodeIndex] / detJacobian; // The x-derivative of the n basis function
+          basisFunctionDerivX[localNodeIndex] = basisFunctionDerivKsi[localNodeIndex] / detJacobian; // The x-derivative of the n basis function
         }
 
         // Computation of Galerkin's residuals and Jacobian matrix
         for (let localNodeIndex1 = 0; localNodeIndex1 < numNodes; localNodeIndex1++) {
           let globalNodeIndex1 = localNodalNumbers[localNodeIndex1];
           residualVector[globalNodeIndex1] +=
-            gaussWeights[gaussPointIndex1] *
-            detJacobian *
-            basisFunction[localNodeIndex1];
+            gaussWeights[gaussPointIndex1] * detJacobian * basisFunction[localNodeIndex1];
 
           for (let localNodeIndex2 = 0; localNodeIndex2 < numNodes; localNodeIndex2++) {
             let globalNodeIndex2 = localNodalNumbers[localNodeIndex2];
@@ -166,8 +163,8 @@ export function assembleSolidHeatTransferMat(meshConfig, boundaryConditions) {
               (basisFunctionDerivX[localNodeIndex1] * basisFunctionDerivX[localNodeIndex2]);
           }
         }
-      // 2D solid heat transfer
-      } else if (meshDimension === '2D') {
+        // 2D solid heat transfer
+      } else if (meshDimension === "2D") {
         for (let gaussPointIndex2 = 0; gaussPointIndex2 < gaussPoints.length; gaussPointIndex2++) {
           // Initialise variables for isoparametric mapping
           let basisFunctionsAndDerivatives = basisFunctionsData.getBasisFunctions(
@@ -199,7 +196,7 @@ export function assembleSolidHeatTransferMat(meshConfig, boundaryConditions) {
               nodesYCoordinates[localNodalNumbers[localNodeIndex]] * basisFunctionDerivKsi[localNodeIndex];
             etaDerivY +=
               nodesYCoordinates[localNodalNumbers[localNodeIndex]] * basisFunctionDerivEta[localNodeIndex];
-              detJacobian = meshDimension === '2D' ? ksiDerivX * etaDerivY - etaDerivX * ksiDerivY : ksiDerivX;
+            detJacobian = meshDimension === "2D" ? ksiDerivX * etaDerivY - etaDerivX * ksiDerivY : ksiDerivX;
           }
 
           // Compute x-derivative and y-derivative of basis functions
