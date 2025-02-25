@@ -10,4 +10,5 @@
 
 export { FEAScriptModel } from "./FEAScript.js";
 export { plotSolution } from "./visualization/plotSolutionScript.js";
-export { printVersion } from "./utilities/helperFunctionsScript.js";
+export { printVersion, setLogLevel } from "./utilities/utilitiesScript.js";
+export { default as loggers } from "./utilities/loggerScript.js";
