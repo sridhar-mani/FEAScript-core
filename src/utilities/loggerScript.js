@@ -8,27 +8,35 @@
 //                                            |_|   | |_   //
 //       Website: https://feascript.com/             \__|  //
 
-// Import loglevel - since it's using CommonJS exports, we need to import it as a namespace
-import * as logModule from '../../third-party/loglevel.min.js';
+// TEMPORARILY DISABLED LOGLEVEL IMPORT DUE TO MODULE LOADING ISSUES
+// import * as logModule from '../../third-party/loglevel.min.js';
+// const log = logModule.default || logModule;
 
-// Access the main log object 
-const log = logModule.default || logModule;
-
-// Configure default log level (can be overridden)
-log.setDefaultLevel(log.levels.INFO);
-
-// Create namespace-specific loggers for different parts of the app
-const loggers = {
-  main: log.getLogger('FEAScript'),
-  solver: log.getLogger('Solver'),
-  mesh: log.getLogger('Mesh'),
-  visualization: log.getLogger('Viz')
+// Create a simple no-op logger to replace loglevel temporarily
+const createNoOpLogger = (name) => {
+  return {
+    name,
+    trace: () => {},
+    debug: () => {},
+    info: () => {},
+    warn: () => {},
+    error: () => {},
+    setLevel: () => {}
+  };
 };
 
-// Helper method to set all loggers to a specific level
-export function setAllLogLevels(level) {
-  Object.values(loggers).forEach(logger => logger.setLevel(level));
+// Mock loggers with no-op functions
+const loggers = {
+  main: createNoOpLogger('FEAScript'),
+  solver: createNoOpLogger('Solver'),
+  mesh: createNoOpLogger('Mesh'),
+  visualization: createNoOpLogger('Viz')
+};
+
+// Helper method (no-op)
+export function setAllLogLevels() {
+  // No-op function
 }
 
-// Export the configured loggers
+// Export the mock loggers
 export default loggers;
