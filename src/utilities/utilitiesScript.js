@@ -8,10 +8,6 @@
 //                                            |_|   | |_   //
 //       Website: https://feascript.com/             \__|  //
 
-import loggers from "./loggerScript.js";
-
-const log = loggers.main;
-
 /**
  * Function to handle version information and fetch the latest update date and release from GitHub
  */
