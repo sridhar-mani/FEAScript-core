@@ -8,7 +8,11 @@
 //                                            |_|   | |_   //
 //       Website: https://feascript.com/             \__|  //
 
-import log from '../../third-party/loglevel.min.js';
+// Import loglevel - since it's using CommonJS exports, we need to import it as a namespace
+import * as logModule from '../../third-party/loglevel.min.js';
+
+// Access the main log object 
+const log = logModule.default || logModule;
 
 // Configure default log level (can be overridden)
 log.setDefaultLevel(log.levels.INFO);
