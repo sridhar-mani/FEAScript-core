@@ -21,16 +21,16 @@ const createNoOpLogger = (name) => {
     info: () => {},
     warn: () => {},
     error: () => {},
-    setLevel: () => {}
+    setLevel: () => {},
   };
 };
 
 // Mock loggers with no-op functions
 const loggers = {
-  main: createNoOpLogger('FEAScript'),
-  solver: createNoOpLogger('Solver'),
-  mesh: createNoOpLogger('Mesh'),
-  visualization: createNoOpLogger('Viz')
+  main: createNoOpLogger("FEAScript"),
+  solver: createNoOpLogger("Solver"),
+  mesh: createNoOpLogger("Mesh"),
+  visualization: createNoOpLogger("Viz"),
 };
 
 // Helper method (no-op)

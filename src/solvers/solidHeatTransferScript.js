@@ -28,7 +28,7 @@ const log = loggers.solver;
 export function assembleSolidHeatTransferMat(meshConfig, boundaryConditions) {
   // log.info("Starting solid heat transfer matrix assembly");
   console.log("Starting solid heat transfer matrix assembly");
-  
+
   // Extract mesh details from the configuration object
   const {
     meshDimension, // The dimension of the mesh
@@ -40,7 +40,11 @@ export function assembleSolidHeatTransferMat(meshConfig, boundaryConditions) {
   } = meshConfig;
 
   // log.debug(`Mesh configuration: ${meshDimension}, Elements: ${numElementsX}x${numElementsY || 1}, Size: ${maxX}x${maxY || 0}, Order: ${elementOrder}`);
-  console.log(`Mesh configuration: ${meshDimension}, Elements: ${numElementsX}x${numElementsY || 1}, Size: ${maxX}x${maxY || 0}, Order: ${elementOrder}`);
+  console.log(
+    `Mesh configuration: ${meshDimension}, Elements: ${numElementsX}x${numElementsY || 1}, Size: ${maxX}x${
+      maxY || 0
+    }, Order: ${elementOrder}`
+  );
 
   // Extract boundary conditions from the configuration object
   let convectionHeatTranfCoeff = [];
@@ -51,7 +55,9 @@ export function assembleSolidHeatTransferMat(meshConfig, boundaryConditions) {
       convectionHeatTranfCoeff[key] = boundaryCondition[1];
       convectionExtTemp[key] = boundaryCondition[2];
       // log.debug(`Convection boundary condition on boundary ${key}: h=${boundaryCondition[1]}, T=${boundaryCondition[2]}`);
-      console.log(`Convection boundary condition on boundary ${key}: h=${boundaryCondition[1]}, T=${boundaryCondition[2]}`);
+      console.log(
+        `Convection boundary condition on boundary ${key}: h=${boundaryCondition[1]}, T=${boundaryCondition[2]}`
+      );
     }
   });
 
@@ -85,7 +91,7 @@ export function assembleSolidHeatTransferMat(meshConfig, boundaryConditions) {
   const totalNodes = totalNodesX * (meshDimension === "2D" ? totalNodesY : 1); // Total number of nodes
   // log.debug(`Total elements: ${totalElements}, Total nodes: ${totalNodes}`);
   console.log(`Total elements: ${totalElements}, Total nodes: ${totalNodes}`);
-  
+
   // Initialize variables for matrix assembly
   let localNodalNumbers = []; // Local nodal numbering
   let gaussPoints = []; // Gauss points
@@ -137,7 +143,7 @@ export function assembleSolidHeatTransferMat(meshConfig, boundaryConditions) {
 
   // Determine the number of nodes in the reference element based on the first element in the nop array
   const numNodes = nop[0].length;
-  
+
   // log.info(`Beginning matrix assembly for ${totalElements} elements...`);
   console.log(`Beginning matrix assembly for ${totalElements} elements...`);
 
@@ -291,7 +297,7 @@ export function assembleSolidHeatTransferMat(meshConfig, boundaryConditions) {
   thermalBoundaryConditions.imposeConstantTempBoundaryConditions(residualVector, jacobianMatrix);
   // log.debug("Constant temperature boundary conditions applied");
   console.log("Constant temperature boundary conditions applied");
-  
+
   // log.info("Solid heat transfer matrix assembly completed");
   console.log("Solid heat transfer matrix assembly completed");
 

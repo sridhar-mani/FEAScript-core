@@ -8,7 +8,7 @@
 //                                            |_|   | |_   //
 //       Website: https://feascript.com/             \__|  //
 
-import loggers from './loggerScript.js';
+import loggers from "./loggerScript.js";
 
 const log = loggers.main;
 
