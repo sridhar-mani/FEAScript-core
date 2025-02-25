@@ -9,6 +9,7 @@
 //       Website: https://feascript.com/             \__|  //
 
 import { assembleSolidHeatTransferMat } from "./solvers/solidHeatTransferScript.js";
+import { basicLog, debugLog } from "./utilities/utilitiesScript.js";
 
 /**
  * FEAScript: An open-source finite element simulation library developed in JavaScript
@@ -23,27 +24,27 @@ export class FEAScriptModel {
     this.meshConfig = {};
     this.boundaryConditions = {};
     this.solverMethod = "lusolve"; // Default solver method
-    console.log("FEAScriptModel instance created");
+    basicLog("FEAScriptModel instance created");
   }
 
   setSolverConfig(solverConfig) {
     this.solverConfig = solverConfig;
-    console.log(`Solver config set to: ${solverConfig}`);
+    debugLog(`Solver config set to: ${solverConfig}`);
   }
 
   setMeshConfig(meshConfig) {
     this.meshConfig = meshConfig;
-    console.log(`Mesh config set with dimensions: ${meshConfig.meshDimension}, elements: ${meshConfig.numElementsX}x${meshConfig.numElementsY || 1}`);
+    debugLog(`Mesh config set with dimensions: ${meshConfig.meshDimension}, elements: ${meshConfig.numElementsX}x${meshConfig.numElementsY || 1}`);
   }
 
   addBoundaryCondition(boundaryKey, condition) {
     this.boundaryConditions[boundaryKey] = condition;
-    console.log(`Boundary condition added for key: ${boundaryKey}, type: ${condition[0]}`);
+    debugLog(`Boundary condition added for boundary: ${boundaryKey}, type: ${condition[0]}`);
   }
 
   setSolverMethod(solverMethod) {
     this.solverMethod = solverMethod;
-    console.log(`Solver method set to: ${solverMethod}`);
+    debugLog(`Solver method set to: ${solverMethod}`);
   }
 
   solve() {
@@ -53,37 +54,33 @@ export class FEAScriptModel {
       throw new Error(error);
     }
 
-    let jacobianMatrix = []; // Jacobian matrix
-    let residualVector = []; // Galerkin residuals
-    let solutionVector = []; // Solution vector
-    let nodesCoordinates = {}; // Object to store x and y coordinates of nodes
+    let jacobianMatrix = [];
+    let residualVector = [];
+    let solutionVector = [];
+    let nodesCoordinates = {};
 
     // Assembly matrices
-    console.log("Beginning matrix assembly...");
+    basicLog("Beginning matrix assembly...");
     console.time("assemblyMatrices");
     if (this.solverConfig === "solidHeatTransferScript") {
-      console.log(`Using solver: ${this.solverConfig}`);
+      basicLog(`Using solver: ${this.solverConfig}`);
       ({ jacobianMatrix, residualVector, nodesCoordinates } = assembleSolidHeatTransferMat(
         this.meshConfig,
         this.boundaryConditions
       ));
     }
     console.timeEnd("assemblyMatrices");
-    console.log("Matrix assembly completed");
+    basicLog("Matrix assembly completed");
 
     // System solving
-    console.log(`Solving system using ${this.solverMethod}...`);
+    basicLog(`Solving system using ${this.solverMethod}...`);
     console.time("systemSolving");
     if (this.solverMethod === "lusolve") {
-      solutionVector = math.lusolve(jacobianMatrix, residualVector); // Solve the system of linear equations using LU decomposition
+      solutionVector = math.lusolve(jacobianMatrix, residualVector);
     }
     console.timeEnd("systemSolving");
-    console.log("System solved successfully");
+    basicLog("System solved successfully");
 
-    // Return the solution matrix and nodes coordinates
-    return {
-      solutionVector,
-      nodesCoordinates,
-    };
+    return { solutionVector, nodesCoordinates };
   }
 }

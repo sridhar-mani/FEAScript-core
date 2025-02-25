@@ -8,34 +8,62 @@
 //                                            |_|   | |_   //
 //       Website: https://feascript.com/             \__|  //
 
+// Global logging level
+let currentLogLevel = 'basic';
+
 /**
- * Function to handle version information and fetch the latest update date and release from GitHub
+ * Function to set the logging system level
+ * @param {string} level - Logging level (basic, debug)
  */
-export async function printVersion() {
-  // log.info("Fetching latest FEAScript version information...");
-  console.log("Fetching latest FEAScript version information...");
-  try {
-    // Fetch the latest commit date
-    const commitResponse = await fetch("https://api.github.com/repos/FEAScript/FEAScript/commits/main");
-    const commitData = await commitResponse.json();
-    const latestCommitDate = new Date(commitData.commit.committer.date).toLocaleString();
-    // log.info(`Latest FEAScript update: ${latestCommitDate}`);
-    console.log(`Latest FEAScript update: ${latestCommitDate}`);
-    return latestCommitDate;
-  } catch (error) {
-    // log.error("Failed to fetch version information:", error);
-    console.error("Failed to fetch version information:", error);
-    return "Version information unavailable";
+export function logSystem(level) {
+  if (level !== 'basic' && level !== 'debug') {
+    console.log('%c[WARN] Invalid log level: ' + level + '. Using basic instead.', 'color: #FFC107; font-weight: bold;'); // Yellow for warnings
+    currentLogLevel = 'basic';
+  } else {
+    currentLogLevel = level;
+    basicLog(`Log level set to: ${level}`);
   }
 }
 
 /**
- * Set the logging level for all loggers
- * @param {string} level - The log level to set (trace, debug, info, warn, error)
+ * Debug logging function - only logs if level is 'debug'
+ * @param {string} message - Message to log
  */
-export function setLogLevel(level) {
-  // Logging is temporarily disabled
-  // loggers.setAllLogLevels(level);
-  // log.info(`Log level set to: ${level}`);
-  console.log(`Log level set to: ${level} (logging temporarily disabled)`);
+export function debugLog(message) {
+  if (currentLogLevel === 'debug') {
+    console.log('%c[DEBUG] ' + message, 'color: #2196F3; font-weight: bold;'); // Blue color for debug
+  }
+}
+
+/**
+ * Basic logging function - always logs
+ * @param {string} message - Message to log
+ */
+export function basicLog(message) {
+  console.log('%c[INFO] ' + message, 'color: #4CAF50; font-weight: bold;'); // Green color for basic info
+}
+
+/**
+ * Error logging function
+ * @param {string} message - Message to log
+ */
+export function errorLog(message) {
+  console.log('%c[ERROR] ' + message, 'color: #F44336; font-weight: bold;'); // Red color for errors
+}
+
+/**
+ * Function to handle version information and fetch the latest update date and release from GitHub
+ */
+export async function printVersion() {
+  basicLog("Fetching latest FEAScript version information...");
+  try {
+    const commitResponse = await fetch("https://api.github.com/repos/FEAScript/FEAScript/commits/main");
+    const commitData = await commitResponse.json();
+    const latestCommitDate = new Date(commitData.commit.committer.date).toLocaleString();
+    basicLog(`Latest FEAScript update: ${latestCommitDate}`);
+    return latestCommitDate;
+  } catch (error) {
+    errorLog("Failed to fetch version information: " + error);
+    return "Version information unavailable";
+  }
 }

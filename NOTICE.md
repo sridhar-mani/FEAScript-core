@@ -9,8 +9,3 @@ FEAScript makes use of the following third-party software:
    - License: MIT License
    - Source: https://github.com/plotly/plotly.js/tree/master
    - License: https://github.com/plotly/plotly.js/blob/master/LICENSE
-
-2. **loglevel**
-   - License: MIT License
-   - Source: https://github.com/pimterry/loglevel
-   - License: https://github.com/pimterry/loglevel/blob/main/LICENSE-MIT
