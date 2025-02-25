@@ -8,7 +8,7 @@
 //                                            |_|   | |_   //
 //       Website: https://feascript.com/             \__|  //
 
-import log from '../third-party/loglevel.min.js';
+import log from '../../third-party/loglevel.min.js';
 
 // Configure default log level (can be overridden)
 log.setDefaultLevel(log.levels.INFO);
