@@ -146,7 +146,9 @@ export class ThermalBoundaryConditions {
     convectionHeatTranfCoeff,
     convectionExtTemp
   ) {
-    if (this.meshDimension === "2D") {
+    if (this.meshDimension === "1D") {
+      // 1D code
+    } else if (this.meshDimension === "2D") {
       Object.keys(this.boundaryConditions).forEach((boundaryKey) => {
         if (this.boundaryConditions[boundaryKey][0] === "convection") {
           const convectionCoeff = convectionHeatTranfCoeff[boundaryKey];
