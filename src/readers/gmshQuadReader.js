@@ -7,12 +7,14 @@ const importGmsh = async (file) => {
     gmshV: 0,
     ascii: false,
     fltBytes: 8,
+    totalNodesX:0,
+    totalNodesY:0
   };
   let textre = await file.text();
   textre = textre
     .split("\n")
     .map((eachLine) => eachLine.trim())
-    .filter((eachLine) => eachLine != "" || eachLine != " ");
+    .filter((eachLine) => eachLine != "" && eachLine != " ");
 
   let inNodesSections = false;
 
@@ -65,7 +67,6 @@ const importGmsh = async (file) => {
     let temp = line.split(" ");
     if (inNodesSections) {
       if (temp.length === 3) {
-        console.log(temp);
         newFin.totalNodesX += 1;
         newFin.totalNodesY += 1;
         newFin.nodesXCoordinates = [
@@ -105,7 +106,7 @@ const importGmsh = async (file) => {
       [elements[2], elements[3]],
       [elements[3], elements[0]],
     ];
-    for (let j = 0; j < edges.length - 1; j++) {
+    for (let j = 0; j < edges.length ; j++) {
       const edge = edges[j];
       const key =
         edge[0] < edge[1] ? `${edge[0]}-${edge[1]}` : `${edge[1]}-${edge[0]}`;
@@ -124,13 +125,16 @@ const importGmsh = async (file) => {
       }
     }
   }
+
+  newFin.boundaryElements = newFin.boundaryElements.filter(each=>each);
+
   // });
 
   // if (useKernel) {
   //   await taichiRunner.runKernel(useKernel);
   // }
 
-  return newFin;
+  return {rawText:textre,finJson:newFin};
 };
 
 export { importGmsh };
