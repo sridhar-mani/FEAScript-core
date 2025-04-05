@@ -90,7 +90,6 @@ const importGmsh = async (file) => {
     }
   }
 
-  const tempBoundary = {};
 
   // const taichiRunner = new TaichiRunner();
   // await taichiRunner.init();
@@ -98,36 +97,50 @@ const importGmsh = async (file) => {
   // await taichiRunner.addToScope({ newFin, tempBoundary });
 
   // const useKernel = await taichiRunner.createKernel(() => {
-  for (let i = 0; i < newFin.nodalNumbering.length; i++) {
-    const elements = newFin.nodalNumbering[i];
-    const edges = [
-      [elements[0], elements[1]],
-      [elements[1], elements[2]],
-      [elements[2], elements[3]],
-      [elements[3], elements[0]],
-    ];
-    for (let j = 0; j < edges.length ; j++) {
-      const edge = edges[j];
-      const key =
-        edge[0] < edge[1] ? `${edge[0]}-${edge[1]}` : `${edge[1]}-${edge[0]}`;
-
-      if (!tempBoundary[key]) {
-        tempBoundary[key] = 1;
-
-        if (!newFin.boundaryElements[i]) {
-          newFin.boundaryElements[i] = [];
+    const edgeCount = {};
+    for (let i = 0; i < newFin.nodalNumbering.length; i++) {
+      const element = newFin.nodalNumbering[i];
+      const edges = [
+        [element[0], element[1]],
+        [element[1], element[2]],
+        [element[2], element[3]],
+        [element[3], element[0]],
+      ];
+      edges.forEach((edge) => {
+        const key =
+          edge[0] < edge[1]
+            ? `${edge[0]}-${edge[1]}`
+            : `${edge[1]}-${edge[0]}`;
+        edgeCount[key] = (edgeCount[key] || 0) + 1;
+      });
+    }
+  
+    newFin.boundaryElements = []; 
+    for (let i = 0; i < newFin.nodalNumbering.length; i++) {
+      const element = newFin.nodalNumbering[i];
+      const edges = [
+        [element[0], element[1]],
+        [element[1], element[2]],
+        [element[2], element[3]],
+        [element[3], element[0]],
+      ];
+      for (let j = 0; j < edges.length; j++) {
+        const edge = edges[j];
+        const key =
+          edge[0] < edge[1]
+            ? `${edge[0]}-${edge[1]}`
+            : `${edge[1]}-${edge[0]}`;
+        if (edgeCount[key] === 1) {
+          if (!newFin.boundaryElements[i]) {
+            newFin.boundaryElements[i] = [];
+          }
+          newFin.boundaryElements[i].push([i, j]);
         }
-
-        newFin.boundaryElements[i].push([parseInt(i), parseInt(j)]);
-      } else {
-        let val = tempBoundary[key];
-        tempBoundary[key] = val + 1;
       }
     }
-  }
-
-  newFin.boundaryElements = newFin.boundaryElements.filter(each=>each);
-
+  
+    newFin.boundaryElements = newFin.boundaryElements.filter((each) => each);
+  
   // });
 
   // if (useKernel) {
